@@ -1,0 +1,26 @@
+{{ provenance }}
+# {{ title }}
+<!-- generated {{ generated }} -->
+
+## Sources
+
+{{ a.context_stack.sources | blank }}
+
+## Precedence
+
+{% if a.context_stack.precedence %}
+{{ a.context_stack.precedence }}
+{% else %}
+_Not specified. If two sources contradict each other, the run has no rule to
+follow — worth deciding before that happens rather than after._
+{% endif %}
+
+## Access limits
+
+{{ a.constraints.hard_limits | blank }}
+
+{% if a.constraints.fixed %}
+**Cannot be changed:** {{ a.constraints.fixed }}
+{% endif %}
+
+{{ closing }}

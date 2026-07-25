@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stop your AI assistant from guessing</title>
+<meta name="description" content="Answer seven questions. Get setup files that tell any AI assistant what you actually want.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F5F0; --card:#FFFFFF; --ink:#1E2B26; --ink-soft:#4C5A54;
+    --rule:#D8D4CA; --pine:#25503C; --pine-dark:#1B3D2E;
+    --brass:#A8792B; --brass-soft:#F2E7D3; --ok:#2F6B4F;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:'Public Sans',system-ui,sans-serif;
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px 96px}
+
+  header{padding:56px 0 40px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--pine);margin-bottom:18px}
+  h1{font-family:'Bitter',serif;font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.12;letter-spacing:-.01em;max-width:16ch}
+  .lede{margin-top:18px;max-width:56ch;color:var(--ink-soft);font-size:17px}
+  .lede strong{color:var(--ink);font-weight:600}
+  .free-note{display:inline-block;margin-top:20px;font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;color:var(--pine);border:1px solid var(--pine);padding:5px 12px;border-radius:2px}
+
+  .ledger{margin-top:48px}
+  .ledger-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+  .ledger-head h2{font-family:'Bitter',serif;font-size:20px;font-weight:600}
+  .progress{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft)}
+  .progress b{color:var(--pine)}
+
+  .q{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--rule);margin-top:-1px}
+  .q.open{border-left-color:var(--pine)}
+  .q.done{border-left-color:var(--brass)}
+  .q-head{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:14px;
+    padding:16px 20px 16px 0;cursor:pointer;user-select:none;background:none;border:none;
+    width:100%;text-align:left;font:inherit;color:inherit}
+  .q-head:focus-visible{outline:2px solid var(--pine);outline-offset:-2px}
+  .q-num{font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:center;color:var(--ink-soft)}
+  .q.open .q-num,.q.done .q-num{color:var(--pine);font-weight:500}
+  .q-title{font-family:'Bitter',serif;font-size:17px;font-weight:600}
+  .q-state{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-soft)}
+  .q.done .q-state{color:var(--brass)}
+  .q-body{display:none;padding:0 20px 22px 56px;border-top:1px dashed var(--rule)}
+  .q.open .q-body{display:block}
+  .q-prompt{padding-top:16px;font-size:15.5px;max-width:60ch}
+  .q-example{margin-top:12px;padding:12px 14px;background:var(--paper);
+    border-left:2px solid var(--brass);font-size:13.5px;color:var(--ink-soft);max-width:62ch}
+  .q-example em{font-style:normal;font-weight:600;color:var(--brass)}
+  label{display:block;margin-top:16px;font-size:13px;font-weight:600;letter-spacing:.02em}
+  label .opt{font-weight:400;color:var(--ink-soft)}
+  textarea,input[type=email]{width:100%;margin-top:6px;padding:10px 12px;
+    font-family:'Public Sans',sans-serif;font-size:15px;color:var(--ink);background:#fff;
+    border:1px solid var(--rule);border-radius:2px;resize:vertical}
+  textarea{min-height:64px}
+  textarea:focus,input:focus{outline:2px solid var(--pine);outline-offset:1px;border-color:var(--pine)}
+  ::placeholder{color:#A9AFA9}
+
+  .cta-row{margin-top:32px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .btn{font-family:'Public Sans',sans-serif;font-weight:600;font-size:15.5px;
+    padding:13px 26px;border-radius:2px;border:1px solid var(--pine-dark);
+    background:var(--pine);color:#fff;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--pine-dark)}
+  .btn:disabled{opacity:.55;cursor:wait}
+  .btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+  .cta-note{font-size:13.5px;color:var(--ink-soft);max-width:34ch}
+  .err{margin-top:14px;font-size:14px;color:#8A3B2E;display:none}
+
+  .results{margin-top:56px;border-top:2px solid var(--ink);padding-top:36px;display:none}
+  .results h2{font-family:'Bitter',serif;font-size:22px;font-weight:600}
+  .files{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+  .file{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--card);
+    border:1px solid var(--rule);padding:8px 14px;border-radius:2px;display:flex;gap:8px;align-items:center}
+  .file::before{content:"▤";color:var(--pine);font-size:12px}
+  .dl{margin-top:18px;display:inline-flex;align-items:center;gap:10px;font-weight:600;
+    font-size:15px;color:var(--pine);border:1px solid var(--pine);padding:11px 20px;
+    border-radius:2px;background:#fff;cursor:pointer;text-decoration:none}
+  .dl:hover{background:var(--pine);color:#fff}
+  .check{margin-top:28px;background:var(--card);border:1px solid var(--rule);padding:22px 24px}
+  .check h3{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px}
+  .finding{display:grid;grid-template-columns:92px 1fr;gap:12px;padding:10px 0;
+    border-top:1px dashed var(--rule);font-size:14.5px}
+  .finding:first-of-type{border-top:none}
+  .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;align-self:start;padding:3px 8px;border-radius:2px;text-align:center}
+  .tag.gap{background:#F3E4DE;color:#8A3B2E}
+  .tag.suggestion{background:var(--brass-soft);color:var(--brass)}
+  .tag.note{background:#EEF2EF;color:var(--ink-soft)}
+  .tag.ok{background:#E4EEE8;color:var(--ok)}
+  .finding p b{font-weight:600}
+  .finding .fix{color:var(--ink-soft);font-size:13.5px;margin-top:3px}
+  .no-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--rule);
+    font-size:13.5px;color:var(--ink-soft);font-style:italic}
+
+  .offer{margin-top:40px;background:var(--pine);color:#EDF2EE;padding:34px 34px 30px;
+    border-radius:2px;position:relative;overflow:hidden}
+  .offer::after{content:"";position:absolute;inset:10px;border:1px solid rgba(237,242,238,.25);
+    pointer-events:none;border-radius:1px}
+  .offer h2{font-family:'Bitter',serif;font-size:21px;font-weight:600;max-width:24ch}
+  .offer p{margin-top:12px;font-size:15px;max-width:56ch;color:#CDDCD2}
+  .offer a{color:#F0D9A8;text-decoration-color:rgba(240,217,168,.5)}
+  .offer-row{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+  .offer input[type=email]{flex:1;min-width:220px;border:none;margin-top:0}
+  .btn-brass{background:var(--brass);border-color:var(--brass)}
+  .btn-brass:hover{background:#8F6520}
+  .offer .fine{margin-top:12px;font-size:12.5px;color:#A9C0B1}
+  .offer .status{margin-top:12px;font-size:14px;position:relative;z-index:1}
+
+  footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--rule);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  @media (max-width:560px){
+    .q-head{grid-template-columns:40px 1fr auto;padding-right:14px}
+    .q-body{padding-left:20px}
+    .finding{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Free tool · Seven questions · Five files</div>
+    <h1>Stop your AI assistant from guessing.</h1>
+    <p class="lede">Answer seven questions about your project. Get a set of setup files that tell <strong>any</strong> AI assistant what you actually want — so you stop re-explaining it every session.</p>
+    <span class="free-note">no signup · nothing stored · files are yours</span>
+  </header>
+
+  <section class="ledger" aria-label="The seven questions">
+    <div class="ledger-head">
+      <h2>The seven questions</h2>
+      <div class="progress"><b id="answered">0</b> of <span id="total">7</span> answered</div>
+    </div>
+    <div id="questions"></div>
+    <div class="cta-row">
+      <button class="btn" id="go">Generate my files</button>
+      <p class="cta-note">Partial answers are fine — gaps get flagged, not blocked.</p>
+    </div>
+    <p class="err" id="err"></p>
+  </section>
+
+  <section class="results" id="results" aria-label="Your files">
+    <h2>Your files</h2>
+    <div class="files" id="filelist"></div>
+    <a class="dl" id="download" download="project-setup.zip">Download project-setup.zip</a>
+
+    <div class="check">
+      <h3>What would make it hold up better</h3>
+      <div id="findings"></div>
+      <p class="no-block">None of this blocks you — the files work as they are, and every item is a two-minute edit.</p>
+    </div>
+
+    <div class="offer">
+      <h2>Doing this for every project</h2>
+      <p>These files came from a repeatable seven-part setup. The reasoning behind each part — and how it shifts across different kinds of work — is what <a href="#" id="bookLink" rel="noopener">the book</a> covers.</p>
+      <div class="offer-row">
+        <input type="email" id="email" placeholder="you@example.com" aria-label="Email for sample chapter">
+        <button class="btn btn-brass" id="send">Send me chapter one</button>
+      </div>
+      <p class="fine">One email with the chapter. No sequence, no drip.</p>
+      <p class="status" id="subStatus"></p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Context First Framework</span>
+    <span>Honor and progress · Built in Mississippi</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SPEC = null;
+
+  function el(tag, cls, text){
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function fieldId(layer, field){ return "f_" + layer + "__" + field; }
+
+  function layerAnswered(layer){
+    return layer.fields.some(function(f){
+      var box = document.getElementById(fieldId(layer.id, f.id));
+      return box && box.value.trim().length > 0;
+    });
+  }
+
+  function refreshProgress(){
+    var count = 0;
+    SPEC.layers.forEach(function(layer){
+      var card = document.getElementById("q_" + layer.id);
+      var state = card.querySelector(".q-state");
+      if (layerAnswered(layer)){
+        count++;
+        card.classList.add("done");
+        state.textContent = "answered";
+      } else {
+        card.classList.remove("done");
+        state.textContent = "";
+      }
+    });
+    document.getElementById("answered").textContent = count;
+  }
+
+  function render(){
+    var host = document.getElementById("questions");
+    document.getElementById("total").textContent = SPEC.layers.length;
+
+    SPEC.layers.forEach(function(layer, index){
+      var card = el("div", "q" + (index === 0 ? " open" : ""));
+      card.id = "q_" + layer.id;
+
+      var head = el("button", "q-head");
+      head.type = "button";
+      head.setAttribute("aria-expanded", index === 0 ? "true" : "false");
+      head.appendChild(el("div", "q-num", String(layer.order)));
+      head.appendChild(el("div", "q-title", layer.name));
+      head.appendChild(el("div", "q-state", ""));
+      head.addEventListener("click", function(){
+        var isOpen = card.classList.contains("open");
+        document.querySelectorAll(".q.open").forEach(function(other){ other.classList.remove("open"); });
+        if (!isOpen) card.classList.add("open");
+        head.setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      var body = el("div", "q-body");
+      body.appendChild(el("p", "q-prompt", layer.prompt));
+
+      var example = el("div", "q-example");
+      var em = el("em", null, "Good answer: ");
+      example.appendChild(em);
+      example.appendChild(document.createTextNode(layer.good_example));
+      body.appendChild(example);
+
+      layer.fields.forEach(function(f, fi){
+        var lab = el("label", null, f.label);
+        if (!f.required){
+          var opt = el("span", "opt", "  (optional)");
+          lab.appendChild(opt);
+        }
+        lab.htmlFor = fieldId(layer.id, f.id);
+        var box = el("textarea");
+        box.id = fieldId(layer.id, f.id);
+        if (f.required && fi === 0) box.placeholder = layer.hint;
+        box.addEventListener("input", refreshProgress);
+        body.appendChild(lab);
+        body.appendChild(box);
+      });
+
+      card.appendChild(head);
+      card.appendChild(body);
+      host.appendChild(card);
+    });
+  }
+
+  function collect(){
+    var answers = {};
+    SPEC.layers.forEach(function(layer){
+      answers[layer.id] = {};
+      layer.fields.forEach(function(f){
+        answers[layer.id][f.id] = document.getElementById(fieldId(layer.id, f.id)).value.trim();
+      });
+    });
+    return answers;
+  }
+
+  function showError(message){
+    var err = document.getElementById("err");
+    err.textContent = message;
+    err.style.display = message ? "block" : "none";
+  }
+
+  function renderFindings(data){
+    var host = document.getElementById("findings");
+    host.innerHTML = "";
+
+    if (data.solid && data.solid.length){
+      var row = el("div", "finding");
+      row.appendChild(el("span", "tag ok", "solid"));
+      var p = el("p");
+      var b = el("b", null, data.solid.join(", "));
+      p.appendChild(b);
+      p.appendChild(document.createTextNode(" — specific and ready to use."));
+      row.appendChild(p);
+      host.appendChild(row);
+    }
+
+    var labels = { gap: "missing", suggestion: "thin", note: "consider" };
+    data.findings.forEach(function(f){
+      var row = el("div", "finding");
+      row.appendChild(el("span", "tag " + f.severity, labels[f.severity] || f.severity));
+      var cell = el("div");
+      var p = el("p");
+      p.appendChild(el("b", null, f.layer + ": "));
+      p.appendChild(document.createTextNode(f.message));
+      cell.appendChild(p);
+      if (f.suggestion) cell.appendChild(el("p", "fix", f.suggestion));
+      row.appendChild(cell);
+      host.appendChild(row);
+    });
+  }
+
+  document.getElementById("go").addEventListener("click", function(){
+    var button = this;
+    showError("");
+    button.disabled = true;
+    button.textContent = "Generating…";
+
+    fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers: collect() })
+    })
+    .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
+    .then(function(result){
+      if (!result.ok){ showError(result.data.error || "Something went wrong. Try again."); return; }
+      var data = result.data;
+
+      var list = document.getElementById("filelist");
+      list.innerHTML = "";
+      data.files.forEach(function(name){ list.appendChild(el("span", "file", name)); });
+
+      document.getElementById("download").href =
+        "data:application/zip;base64," + data.zip_b64;
+
+      renderFindings(data);
+      var results = document.getElementById("results");
+      results.style.display = "block";
+      results.scrollIntoView({ behavior: "smooth", block: "start" });
+    })
+    .catch(function(){ showError("Couldn't reach the server. Check your connection and try again."); })
+    .finally(function(){
+      button.disabled = false;
+      button.textContent = "Generate my files";
+    });
+  });
+
+  document.getElementById("send").addEventListener("click", function(){
+    var status = document.getElementById("subStatus");
+    var email = document.getElementById("email").value;
+    status.textContent = "";
+    fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email })
+    })
+    .then(function(res){ return res.json().then(function(data){ return { ok: res.ok, data: data }; }); })
+    .then(function(result){
+      status.textContent = result.ok
+        ? "Sent — the chapter is on its way."
+        : (result.data.error || "Something went wrong. Try again in a minute.");
+    })
+    .catch(function(){ status.textContent = "Couldn't reach the server. Try again in a minute."; });
+  });
+
+  fetch("/api/spec")
+    .then(function(res){ return res.json(); })
+    .then(function(data){ SPEC = data; render(); refreshProgress(); })
+    .catch(function(){ showError("Couldn't load the questions. Refresh the page."); });
+})();
+</script>
+</body>
+</html>

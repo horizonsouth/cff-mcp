@@ -1,0 +1,32 @@
+# Two containers: the app, and Caddy in front of it for automatic HTTPS.
+# Nothing else. No database, because the app stores nothing.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      # Set these in a .env file next to this compose file.
+      ESP_ENDPOINT: ${ESP_ENDPOINT:-}
+      ESP_KEY: ${ESP_KEY:-}
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?set SITE_DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data      # TLS certificates — the only state on the box
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:

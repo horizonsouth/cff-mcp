@@ -1,0 +1,37 @@
+{{ provenance }}
+# {{ title }}
+<!-- generated {{ generated }} -->
+
+## Objective for a single run
+
+{{ a.mission.statement | blank }}
+
+## 1. Load the sources
+
+{{ a.context_stack.sources | blank }}
+
+{% if a.context_stack.precedence %}
+When two sources disagree: {{ a.context_stack.precedence }}
+{% endif %}
+
+## 2. Match the known-good shape
+
+{{ a.pattern_signal.positive | blank }}
+
+{% if a.pattern_signal.negative %}
+Avoid this failure mode: {{ a.pattern_signal.negative }}
+{% endif %}
+
+## 3. Produce the output
+
+Work to the shape above, drawing only on the sources listed in step 1.
+
+## 4. Check before handing it over
+
+{{ a.success_criteria.checks | blank }}
+
+{% if a.success_criteria.fail_conditions %}
+Stop and redo if: {{ a.success_criteria.fail_conditions }}
+{% endif %}
+
+{{ closing }}

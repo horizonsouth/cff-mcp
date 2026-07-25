@@ -1,0 +1,32 @@
+{{ provenance }}
+# {{ title }}
+<!-- generated {{ generated }} -->
+
+## What this project is for
+
+{{ a.mission.statement | blank }}
+
+{% if a.mission.not_doing %}
+**Explicitly out of scope:** {{ a.mission.not_doing }}
+{% endif %}
+
+## Hard limits
+
+{{ a.constraints.hard_limits | blank }}
+
+{% if a.constraints.fixed %}
+**Fixed and not up for negotiation:** {{ a.constraints.fixed }}
+{% endif %}
+{% if a.constraints.tone %}
+**Tone:** {{ a.constraints.tone }}
+{% endif %}
+
+## What counts as acceptable
+
+{{ a.success_criteria.checks | blank }}
+
+{% if a.success_criteria.fail_conditions %}
+**Reject outright if:** {{ a.success_criteria.fail_conditions }}
+{% endif %}
+
+{{ closing }}

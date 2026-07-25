@@ -1,0 +1,38 @@
+{{ provenance }}
+# {{ title }}
+<!-- generated {{ generated }} -->
+
+## Trigger
+
+A request for output aimed at: {{ a.audience.who | blank }}
+
+## Sequence
+
+1. Confirm the request fits this project's purpose.
+2. Load sources (see CONNECTOR.md).
+3. Draft against the known-good example:
+   {{ a.pattern_signal.positive | blank }}
+4. Check against the criteria below.
+5. Deliver in the specified form.
+
+## Stopping conditions
+
+Do not deliver until:
+
+{{ a.success_criteria.checks | blank }}
+
+{% if a.success_criteria.fail_conditions %}
+Halt and restart if: {{ a.success_criteria.fail_conditions }}
+{% endif %}
+
+## Handoff
+
+**Form:** {{ a.medium.format | blank }}
+{% if a.medium.destination %}
+**Destination:** {{ a.medium.destination }}
+{% endif %}
+{% if a.audience.next_action %}
+**What happens next:** {{ a.audience.next_action }}
+{% endif %}
+
+{{ closing }}

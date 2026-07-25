@@ -1,0 +1,39 @@
+{{ provenance }}
+# {{ title }}
+<!-- generated {{ generated }} -->
+
+## When to use this
+
+{{ a.mission.statement | blank }}
+
+## Who the output is for
+
+{{ a.audience.who | blank }}
+
+**What they already know:** {{ a.audience.knows | blank }}
+{% if a.audience.next_action %}
+**What they do with it next:** {{ a.audience.next_action }}
+{% endif %}
+
+Write for that reader specifically. Assume the knowledge listed above and
+explain anything outside it.
+
+## What good looks like
+
+{{ a.pattern_signal.positive | blank }}
+
+{% if a.pattern_signal.negative %}
+## What to avoid
+
+{{ a.pattern_signal.negative }}
+{% endif %}
+
+## Form of the output
+
+{{ a.medium.format | blank }}
+{% if a.medium.destination %}
+
+Lands in: {{ a.medium.destination }}
+{% endif %}
+
+{{ closing }}

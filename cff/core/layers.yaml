@@ -1,0 +1,244 @@
+# This file is the single source of truth for the framework.
+# It is served as an MCP resource, consumed by the validator, and (later)
+# used to generate the web form. Edit here, nowhere else.
+
+version: "0.1.0"
+framework:
+  name: "Context First Framework"
+  short: "CFF"
+  url: "https://example.com/context-first"   # TODO: replace with real book/landing URL
+  author: "Jonathon Hamilton"
+
+layers:
+  - id: mission
+    name: Mission
+    order: 1
+    definition: >
+      The single outcome this project exists to produce, stated so plainly that
+      someone could tell whether it happened.
+    why: >
+      Without it the model optimizes for whatever the last message implied.
+      Everything downstream inherits its precision or its fog.
+    prompt: "In one or two sentences, what is this project supposed to produce or change?"
+    fields:
+      - id: statement
+        label: "Mission statement"
+        required: true
+      - id: not_doing
+        label: "Explicitly out of scope"
+        required: false
+    good_example: >
+      Turn raw weekly support tickets into a one-page summary a manager can read
+      in five minutes and act on. Not doing: replying to customers.
+    bad_example: >
+      Use AI to improve our support process.
+    thinness:
+      min_words: 12
+      vague_terms: ["improve", "optimize", "leverage", "streamline", "better", "help with", "stuff"]
+      hint: >
+        Name the artifact and who acts on it. "Improve X" is a direction, not a mission.
+
+  - id: audience
+    name: Audience
+    order: 2
+    definition: >
+      Who receives the output, what they already know, and what they will do
+      with it the moment they get it.
+    why: >
+      The same facts written for a peer and for an executive are different
+      documents. The model cannot guess which one you meant.
+    prompt: "Who reads or uses the output, and what do they already know?"
+    fields:
+      - id: who
+        label: "Primary reader or user"
+        required: true
+      - id: knows
+        label: "What they already know"
+        required: true
+      - id: next_action
+        label: "What they do next with it"
+        required: false
+    good_example: >
+      A shift manager with no data background. Knows the ticket categories
+      cold, has never opened a spreadsheet formula. Uses it to staff Monday.
+    bad_example: >
+      Internal stakeholders.
+    thinness:
+      min_words: 10
+      vague_terms: ["stakeholders", "users", "the team", "everyone", "end users"]
+      hint: >
+        Name one person you could picture. Categories produce category-shaped output.
+
+  - id: constraints
+    name: Constraints
+    order: 3
+    definition: >
+      The hard limits: what must not happen, what cannot be touched, what is
+      non-negotiable about tone, tools, data, cost, or time.
+    why: >
+      Constraints are the cheapest correction you will ever make. Stated up
+      front they cost a sentence; discovered later they cost a rewrite.
+    prompt: "What must never happen, and what can't be changed?"
+    fields:
+      - id: hard_limits
+        label: "Hard limits (must not happen)"
+        required: true
+      - id: fixed
+        label: "Fixed elements (tools, formats, data you can't change)"
+        required: false
+      - id: tone
+        label: "Tone or voice requirements"
+        required: false
+    good_example: >
+      Never invent a ticket number. Output must be plain markdown, no tables.
+      Cannot read the customer PII columns. Must fit on one printed page.
+    bad_example: >
+      Keep it professional and accurate.
+    thinness:
+      min_words: 10
+      vague_terms: ["professional", "accurate", "high quality", "as needed", "appropriate"]
+      hint: >
+        A real constraint can be violated. If it can't be violated, it isn't one.
+
+  - id: context_stack
+    name: Context Stack
+    order: 4
+    definition: >
+      The specific materials the model needs in front of it — documents, data,
+      prior examples, systems of record — and where each one lives.
+    why: >
+      This is the difference between a model that knows your world and one that
+      is confidently describing a generic version of it.
+    prompt: "What documents, data, or examples does the model need access to?"
+    fields:
+      - id: sources
+        label: "Sources (name and location of each)"
+        required: true
+      - id: precedence
+        label: "Which source wins when two disagree"
+        required: false
+    good_example: >
+      1. ticket_export.csv (weekly, from Zendesk). 2. category_definitions.md
+      (owned by ops, authoritative). 3. Last three summaries in /archive as
+      format examples. On conflict, category_definitions.md wins.
+    bad_example: >
+      Our internal documentation.
+    thinness:
+      min_words: 10
+      vague_terms: ["documentation", "our data", "relevant files", "company info"]
+      hint: >
+        List sources individually with a location. An unnamed source can't be loaded.
+
+  - id: pattern_signal
+    name: Pattern Signal
+    order: 5
+    definition: >
+      A concrete example of the output done right — or done wrong — that shows
+      the shape you want rather than describing it.
+    why: >
+      One example moves a model further than a paragraph of adjectives. This is
+      the highest-leverage layer and the one most often skipped.
+    prompt: "Can you show one example of the output done well, or done badly?"
+    fields:
+      - id: positive
+        label: "Example of a good output (paste or point to it)"
+        required: true
+      - id: negative
+        label: "Example of a bad output, and why it's bad"
+        required: false
+    good_example: >
+      Good: the Oct 14 summary in /archive — three bullets, each naming a
+      category, a count, and a recommended action. Bad: the Oct 21 one, which
+      described trends without ever recommending anything.
+    bad_example: >
+      Something clear and well organized.
+    thinness:
+      min_words: 12
+      vague_terms: ["clear", "well organized", "good", "like the usual", "standard"]
+      hint: >
+        Point at a real artifact. Describing the shape is not the same as showing it.
+
+  - id: success_criteria
+    name: Success Criteria
+    order: 6
+    definition: >
+      How you will tell, on inspection, whether a given output is acceptable.
+      A checklist, not a feeling.
+    why: >
+      Criteria let you correct a bad output in one line instead of restarting
+      the conversation. They also become your acceptance test.
+    prompt: "How will you know an output is good enough to use?"
+    fields:
+      - id: checks
+        label: "Checks an output must pass"
+        required: true
+      - id: fail_conditions
+        label: "Automatic rejection conditions"
+        required: false
+    good_example: >
+      Fits one page. Every claim traces to a ticket ID. Ends with exactly three
+      recommended actions. Reject if any category is mentioned without a count.
+    bad_example: >
+      It should be useful and correct.
+    thinness:
+      min_words: 10
+      vague_terms: ["useful", "correct", "good", "makes sense", "reads well"]
+      hint: >
+        Write checks you could hand to someone else to run without explaining.
+
+  - id: medium
+    name: Medium
+    order: 7
+    definition: >
+      The form the output takes and the environment it lands in — file type,
+      length, where it gets pasted, what reads it next.
+    why: >
+      Output written for a chat window and output written for a committed file
+      differ in structure, not just formatting.
+    prompt: "What form does the output take, and where does it end up?"
+    fields:
+      - id: format
+        label: "Format and length"
+        required: true
+      - id: destination
+        label: "Where it lands (file, tool, inbox, another system)"
+        required: false
+    good_example: >
+      A markdown file, under 400 words, committed to /reports and pasted into a
+      Monday Slack post. Read by humans, not parsed by anything.
+    bad_example: >
+      A document.
+    thinness:
+      min_words: 6
+      vague_terms: ["a document", "a report", "text", "output", "something"]
+      hint: >
+        Name the format and the destination. "A report" doesn't say how long or where.
+
+# Which layers feed which generated document.
+# Rule: every layer must appear at least once. If one doesn't, either the layer
+# is mis-scoped or the document set is incomplete.
+documents:
+  - filename: POLICY.md
+    title: "Policy — what this project is for and what it must never do"
+    template: POLICY.md.j2
+    layers: [mission, constraints, success_criteria]
+
+  - filename: PROCEDURE.md
+    title: "Procedure — how a run is carried out, start to finish"
+    template: PROCEDURE.md.j2
+    layers: [mission, context_stack, pattern_signal, success_criteria]
+
+  - filename: SKILL.md
+    title: "Skill — the capability, written for the assistant"
+    template: SKILL.md.j2
+    layers: [mission, audience, pattern_signal, medium]
+
+  - filename: CONNECTOR.md
+    title: "Connector — sources, access, and precedence"
+    template: CONNECTOR.md.j2
+    layers: [context_stack, constraints]
+
+  - filename: FLOW.md
+    title: "Flow — the sequence, handoffs, and stopping conditions"
+    template: FLOW.md.j2
+    layers: [audience, pattern_signal, success_criteria, medium]

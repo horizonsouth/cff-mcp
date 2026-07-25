@@ -1,0 +1,27 @@
+# Caddy obtains and renews Let's Encrypt certificates automatically.
+# The only thing it needs is a domain whose A record points at this server.
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Path-based attribution. /mcp, /tool, /li all serve the same page —
+	# the access log tells you which surface sent the visitor.
+	@attribution path /mcp /tool /li /book
+	rewrite @attribution /
+
+	reverse_proxy app:8000
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	log {
+		output file /data/access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+	}
+}
