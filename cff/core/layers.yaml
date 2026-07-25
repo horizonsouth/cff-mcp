@@ -241,4 +241,4 @@ documents:
   - filename: FLOW.md
     title: "Flow — the sequence, handoffs, and stopping conditions"
     template: FLOW.md.j2
-    layers: [audience, pattern_signal, success_cri
+    layers: [audience, pattern_signal, success_criteria, medium]
