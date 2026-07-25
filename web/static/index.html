@@ -118,6 +118,38 @@
     font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
+
+  .header-actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+  .free-note{margin-top:0}
+  .ghost-btn{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--pine);
+    background:none;border:1px dashed var(--pine);padding:5px 12px;border-radius:2px;
+    cursor:pointer;transition:background .15s,color .15s}
+  .ghost-btn:hover{background:var(--pine);color:#fff}
+  .ghost-btn:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+  dialog.mcp{border:2px solid var(--ink);border-radius:2px;background:var(--paper);
+    color:var(--ink);max-width:640px;width:calc(100vw - 48px);padding:0}
+  dialog.mcp::backdrop{background:rgba(30,43,38,.55)}
+  .mcp-inner{padding:30px 32px 34px}
+  .mcp-inner h2{font-family:'Bitter',serif;font-size:21px;font-weight:600}
+  .mcp-inner .mcp-lede{margin-top:10px;font-size:14.5px;color:var(--ink-soft);max-width:56ch}
+  .mcp-step{margin-top:20px}
+  .mcp-step h3{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--pine);margin-bottom:8px}
+  .mcp-step p{font-size:14px;color:var(--ink-soft);margin-bottom:8px;max-width:58ch}
+  .mcp-step a{color:var(--pine)}
+  .snippet{position:relative;background:var(--ink);color:#DDE7E0;border-radius:2px;
+    padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    line-height:1.6;overflow-x:auto;white-space:pre}
+  .copy{position:absolute;top:8px;right:8px;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#DDE7E0;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);
+    border-radius:2px;padding:3px 8px;cursor:pointer}
+  .copy:hover{background:rgba(255,255,255,.18)}
+  .mcp-close{position:absolute;top:14px;right:16px;font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:6px}
+  .mcp-close:hover{color:var(--ink)}
+
   @media (max-width:560px){
     .q-head{grid-template-columns:40px 1fr auto;padding-right:14px}
     .q-body{padding-left:20px}
@@ -133,7 +165,11 @@
     <div class="eyebrow">Free tool · Seven questions · Five files</div>
     <h1>Stop your AI assistant from guessing.</h1>
     <p class="lede">Answer seven questions about your project. Get a set of setup files that tell <strong>any</strong> AI assistant what you actually want — so you stop re-explaining it every session.</p>
-    <span class="free-note">no signup · nothing stored · files are yours</span>
+    <div class="header-actions">
+      <span class="free-note">no signup · nothing stored · files are yours</span>
+      <button class="ghost-btn" id="demo" type="button">see a worked example</button>
+      <button class="ghost-btn" id="mcpOpen" type="button">prefer a conversation? use it inside Claude</button>
+    </div>
   </header>
 
   <section class="ledger" aria-label="The seven questions">
@@ -178,6 +214,51 @@
   </footer>
 
 </div>
+
+<dialog class="mcp" id="mcpDialog" aria-labelledby="mcpTitle">
+  <div class="mcp-inner">
+    <button class="mcp-close" id="mcpClose" type="button" aria-label="Close">close ✕</button>
+    <h2 id="mcpTitle">Use it inside Claude</h2>
+    <p class="mcp-lede">The same generator ships as an MCP server. Instead of a form,
+      Claude interviews you about your project in plain conversation, then writes the
+      five files straight into your project folder — and can re-check them any time
+      you ask.</p>
+
+    <div class="mcp-step">
+      <h3>1 · Get the two prerequisites</h3>
+      <p><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">Git</a> and
+        <a href="https://docs.astral.sh/uv/getting-started/installation/" target="_blank" rel="noopener">uv</a>
+        (a Python tool runner — one installer, no setup).</p>
+    </div>
+
+    <div class="mcp-step">
+      <h3>2 · Download the server</h3>
+      <div class="snippet"><button class="copy" type="button">copy</button>git clone https://github.com/horizonsouth/cff-mcp</div>
+    </div>
+
+    <div class="mcp-step">
+      <h3>3 · Tell Claude about it</h3>
+      <p><strong>Claude Code</strong> — run this in a terminal (replace the path with wherever you cloned it):</p>
+      <div class="snippet"><button class="copy" type="button">copy</button>claude mcp add cff -- uv run --directory /path/to/cff-mcp cff-mcp</div>
+      <p style="margin-top:12px"><strong>Claude Desktop</strong> — Settings → Developer → Edit Config, then add:</p>
+      <div class="snippet"><button class="copy" type="button">copy</button>{
+  "mcpServers": {
+    "cff": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/cff-mcp", "cff-mcp"]
+    }
+  }
+}</div>
+    </div>
+
+    <div class="mcp-step">
+      <h3>4 · Start the conversation</h3>
+      <p>Restart Claude, open a fresh chat, and say:
+        <em>“Set up my project so you stop guessing.”</em>
+        Claude takes it from there.</p>
+    </div>
+  </div>
+</dialog>
 
 <script>
 (function(){
@@ -366,6 +447,47 @@
         : (result.data.error || "Something went wrong. Try again in a minute.");
     })
     .catch(function(){ status.textContent = "Couldn't reach the server. Try again in a minute."; });
+  });
+
+
+  // --- worked example ---
+  document.getElementById("demo").addEventListener("click", function(){
+    if (!SPEC) return;
+    var hasContent = SPEC.layers.some(function(layer){
+      return layer.fields.some(function(f){
+        var box = document.getElementById(fieldId(layer.id, f.id));
+        return box && box.value.trim().length > 0;
+      });
+    });
+    if (hasContent && !window.confirm("Replace what you've typed with the example answers?")) return;
+    SPEC.layers.forEach(function(layer){
+      layer.fields.forEach(function(f){
+        var box = document.getElementById(fieldId(layer.id, f.id));
+        if (box) box.value = f.sample || "";
+      });
+    });
+    refreshProgress();
+    var first = document.querySelector(".q");
+    if (first){
+      document.querySelectorAll(".q.open").forEach(function(o){ o.classList.remove("open"); });
+      first.classList.add("open");
+      first.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
+  // --- MCP instructions dialog ---
+  var mcpDialog = document.getElementById("mcpDialog");
+  document.getElementById("mcpOpen").addEventListener("click", function(){ mcpDialog.showModal(); });
+  document.getElementById("mcpClose").addEventListener("click", function(){ mcpDialog.close(); });
+  mcpDialog.addEventListener("click", function(e){ if (e.target === mcpDialog) mcpDialog.close(); });
+  document.querySelectorAll(".copy").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var text = btn.parentNode.textContent.replace(/^copy/, "").trim();
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = "copied";
+        setTimeout(function(){ btn.textContent = "copy"; }, 1600);
+      });
+    });
   });
 
   fetch("/api/spec")

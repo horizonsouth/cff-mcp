@@ -24,9 +24,11 @@ layers:
       - id: statement
         label: "Mission statement"
         required: true
+        sample: "Turn raw weekly support tickets into a one-page summary a shift manager can read in five minutes and act on."
       - id: not_doing
         label: "Explicitly out of scope"
         required: false
+        sample: "Replying to customers, editing tickets, or changing the category scheme."
     good_example: >
       Turn raw weekly support tickets into a one-page summary a manager can read
       in five minutes and act on. Not doing: replying to customers.
@@ -52,12 +54,15 @@ layers:
       - id: who
         label: "Primary reader or user"
         required: true
+        sample: "The Saturday shift manager. No data background — has never opened a spreadsheet formula."
       - id: knows
         label: "What they already know"
         required: true
+        sample: "Knows the ticket categories cold and which agents worked which shifts."
       - id: next_action
         label: "What they do next with it"
         required: false
+        sample: "Sets Monday staffing levels and posts the plan in Slack."
     good_example: >
       A shift manager with no data background. Knows the ticket categories
       cold, has never opened a spreadsheet formula. Uses it to staff Monday.
@@ -83,12 +88,15 @@ layers:
       - id: hard_limits
         label: "Hard limits (must not happen)"
         required: true
+        sample: "Never invent a ticket number. Never read the customer PII columns."
       - id: fixed
         label: "Fixed elements (tools, formats, data you can't change)"
         required: false
+        sample: "Data comes only from the weekly Zendesk export. Plain markdown — no tables."
       - id: tone
         label: "Tone or voice requirements"
         required: false
+        sample: "Plain language a floor manager would say out loud; no analytics jargon."
     good_example: >
       Never invent a ticket number. Output must be plain markdown, no tables.
       Cannot read the customer PII columns. Must fit on one printed page.
@@ -114,9 +122,11 @@ layers:
       - id: sources
         label: "Sources (name and location of each)"
         required: true
+        sample: "1. ticket_export.csv — weekly, from Zendesk. 2. category_definitions.md — owned by ops. 3. The last three summaries in /archive, as format examples."
       - id: precedence
         label: "Which source wins when two disagree"
         required: false
+        sample: "category_definitions.md wins any category dispute."
     good_example: >
       1. ticket_export.csv (weekly, from Zendesk). 2. category_definitions.md
       (owned by ops, authoritative). 3. Last three summaries in /archive as
@@ -143,9 +153,11 @@ layers:
       - id: positive
         label: "Example of a good output (paste or point to it)"
         required: true
+        sample: "The Oct 14 summary in /archive — three bullets, each naming a category, a count, and a recommended action."
       - id: negative
         label: "Example of a bad output, and why it's bad"
         required: false
+        sample: "The Oct 21 summary — it described trends for a full page without ever recommending anything."
     good_example: >
       Good: the Oct 14 summary in /archive — three bullets, each naming a
       category, a count, and a recommended action. Bad: the Oct 21 one, which
@@ -172,9 +184,11 @@ layers:
       - id: checks
         label: "Checks an output must pass"
         required: true
+        sample: "Fits one printed page. Every claim traces to a ticket ID. Ends with exactly three recommended actions."
       - id: fail_conditions
         label: "Automatic rejection conditions"
         required: false
+        sample: "Reject if any category appears without a count, or any ticket ID is absent from the export."
     good_example: >
       Fits one page. Every claim traces to a ticket ID. Ends with exactly three
       recommended actions. Reject if any category is mentioned without a count.
@@ -200,9 +214,11 @@ layers:
       - id: format
         label: "Format and length"
         required: true
+        sample: "A markdown file under 400 words."
       - id: destination
         label: "Where it lands (file, tool, inbox, another system)"
         required: false
+        sample: "Committed to /reports, then pasted into the Monday morning Slack post. Read by humans, not parsed by anything."
     good_example: >
       A markdown file, under 400 words, committed to /reports and pasted into a
       Monday Slack post. Read by humans, not parsed by anything.

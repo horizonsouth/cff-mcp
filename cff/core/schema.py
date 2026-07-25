@@ -22,6 +22,7 @@ class FieldSpec:
     id: str
     label: str
     required: bool = False
+    sample: str = ""
 
 
 @dataclass(frozen=True)
@@ -99,7 +100,12 @@ def load_spec(path: Path | None = None) -> Spec:
             good_example=item["good_example"].strip(),
             bad_example=item["bad_example"].strip(),
             fields=tuple(
-                FieldSpec(f["id"], f["label"], bool(f.get("required", False)))
+                FieldSpec(
+                    f["id"],
+                    f["label"],
+                    bool(f.get("required", False)),
+                    f.get("sample", "").strip(),
+                )
                 for f in item.get("fields", [])
             ),
             min_words=int(item.get("thinness", {}).get("min_words", 0)),

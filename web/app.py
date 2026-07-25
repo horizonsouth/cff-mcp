@@ -61,7 +61,12 @@ def spec() -> JSONResponse:
                     "good_example": l.good_example,
                     "hint": l.hint,
                     "fields": [
-                        {"id": f.id, "label": f.label, "required": f.required}
+                        {
+                            "id": f.id,
+                            "label": f.label,
+                            "required": f.required,
+                            "sample": f.sample,
+                        }
                         for f in l.fields
                     ],
                 }
