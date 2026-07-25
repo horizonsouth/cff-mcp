@@ -6,7 +6,7 @@ version: "0.1.0"
 framework:
   name: "Context First Framework"
   short: "CFF"
-  url: "https://example.com/context-first"   # TODO: replace with real book/landing URL
+  url: "https://www.barnesandnoble.com/w/context-first-jonathon-hamilton/1150673799?ean=2940196060113"
   author: "Jonathon Hamilton"
 
 layers:
@@ -241,4 +241,4 @@ documents:
   - filename: FLOW.md
     title: "Flow — the sequence, handoffs, and stopping conditions"
     template: FLOW.md.j2
-    layers: [audience, pattern_signal, success_criteria, medium]
+    layers: [audience, pattern_signal, success_cri
