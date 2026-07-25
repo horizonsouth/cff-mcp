@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.horizonsouth/cff-mcp",
+  "description": "Set up a project so an AI assistant stops guessing — interviews you, then generates a five-document context stack.",
+  "repository": {
+    "url": "https://github.com/horizonsouth/cff-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registry_type": "pypi",
+      "identifier": "cff-mcp",
+      "version": "0.1.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}
